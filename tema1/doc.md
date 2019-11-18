@@ -47,6 +47,7 @@ g = 2
 mesaj = ABCDEF
 criptat = BCEIDG
 decriptat = ABCDEF
+```
 
 ### Cod sursa (MIPS)
 ```assembly
