@@ -17,7 +17,7 @@ func main:
     lw $s3, ($s3)
 
 evalueaza:
-    bge $s1, $s3, iesire_evalueaza 
+    bgt $s1, $s3, iesire_evalueaza 
 
     call suma_drum_dreapta $s2 $s1
     add $s0, $s0, $v0

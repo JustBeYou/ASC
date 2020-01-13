@@ -19,7 +19,7 @@ subu $sp, $sp, 4
     lw $s3, ($s3)
 
 evalueaza:
-    bge $s1, $s3, iesire_evalueaza 
+    bgt $s1, $s3, iesire_evalueaza 
 
     subu $sp, $sp, 8
     sw $s2, 0($sp)
