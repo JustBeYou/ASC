@@ -1,0 +1,74 @@
+PRINT_INT_SYSCALL = 1
+PRINT_STR_SYSCALL = 4
+READ_INT_SYSCALL  = 5
+READ_STR_SYSCALL  = 8
+EXIT_SYSCALL      = 10 
+
+.data
+    N: .word 10
+    vector: .word 0, 16, 14, 10, 8, 7, 9, 3, 2, 4, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+
+.text
+func main:
+    li $s0, 0
+    li $s1, 1
+    la $s2, vector
+    la $s3, N
+    lw $s3, ($s3)
+
+evalueaza:
+    bge $s1, $s3, iesire_evalueaza 
+
+    call suma_drum_dreapta $s2 $s1
+    add $s0, $s0, $v0
+
+    addiu $s1, $s1, 1
+    j evalueaza
+
+iesire_evalueaza:
+    move $a0, $s0
+    li $v0, PRINT_INT_SYSCALL
+    syscall
+
+    li $v0, EXIT_SYSCALL
+    syscall
+
+func suma_drum_dreapta:
+    save $s0
+
+    arg vectorIntrare
+    arg indexIntrare
+
+    lw $t1, vectorIntrare
+    lw $t2, indexIntrare
+
+    li $t3, 4
+    mult $t2, $t3
+    mflo $t2
+    addu $t1, $t1, $t2
+    lw $t1, ($t1) # element curent v[i]
+
+    beq $t1, -1, returneaza_0
+
+    # S = v[i] + suma_drum_dreapta(v, 2 * i + 1)   
+    move $s0, $t1
+
+    lw $t1, vectorIntrare
+    lw $t2, indexIntrare
+    li $t3, 2
+    mult $t2, $t3
+    mflo $t2
+    addiu $t2, $t2, 1
+
+    call suma_drum_dreapta $t1 $t2
+    addu $s0, $s0, $v0
+
+    move $t1, $s0
+    j iesire_suma
+
+returneaza_0:
+    li $t1, 0
+    j iesire_suma
+
+iesire_suma:
+    return reg $t1
