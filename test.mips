@@ -1,0 +1,43 @@
+PRINT_INT_SYSCALL = 1
+PRINT_STR_SYSCALL = 4
+READ_INT_SYSCALL  = 5
+READ_STR_SYSCALL  = 8
+EXIT_SYSCALL      = 10 
+
+.text
+func main:
+    li $s0, 0xdead
+    li $s1, 0xbeef
+    li $s2, 0xcafe
+
+    li $t1, 0xbad
+    li $t2, 0xbeef
+
+    call sum $t1 $t2 
+
+    exit
+
+func sum:
+    save $s0
+    save $s1
+    save $s2
+
+    var varSum 0
+    var varA 5
+    var varB 10
+
+    arg input1
+    arg input2
+    
+    li $t1, 0
+    lw $t2, varA
+    lw $t3, varB
+    addu $t1, $t2, $t3
+    lw $t2, input1
+    lw $t3, input2
+    addu $t1, $t1, $t2
+    addu $t1, $t1, $t3
+
+    sw $t1, varSum
+
+    return mem varSum

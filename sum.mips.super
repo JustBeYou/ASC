@@ -1,0 +1,55 @@
+PRINT_INT_SYSCALL = 1
+PRINT_STR_SYSCALL = 4
+READ_INT_SYSCALL  = 5
+READ_STR_SYSCALL  = 8
+EXIT_SYSCALL      = 10 
+
+.text
+main:
+sw $ra, ($sp)
+subu $sp, $sp, 4
+    li $t1, 10
+    li $t2, 20
+
+    subu $sp, $sp, 8
+    sw $t1, 0($sp)
+    sw $t2, 4($sp)
+    subu $sp, $sp, 4
+    jal sum
+    addiu $sp, $sp, 8
+
+    move $a0, $v0
+    li $v0, PRINT_INT_SYSCALL
+    syscall
+
+    li $v0, EXIT_SYSCALL
+    syscall
+
+sum:
+sw $ra, ($sp)
+subu $sp, $sp, 4
+    subu $sp, $sp, 0
+    sw $fp, ($sp)
+    subu $sp, $sp, 4
+    move $fp, $sp
+    subu $sp, $sp, 4
+
+    li $t0, 0
+    sw $t0, -0($fp)
+
+    lw $t1, 12($fp)
+    lw $t2, 16($fp)
+    addiu $t1, $t1, $t2
+    sw $t1, -0($fp)
+
+
+    lw $t0, -0($fp)
+    move $v0, $t0
+
+    addiu $sp, $sp, 4
+    lw $fp, 0($sp)
+    addiu $sp, $sp, 8
+    addiu $sp, $sp, 0
+    lw $ra, 0($sp)
+    jr $ra
+

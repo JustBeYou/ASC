@@ -1,0 +1,146 @@
+PRINT_INT_SYSCALL = 1
+PRINT_STR_SYSCALL = 4
+READ_INT_SYSCALL  = 5
+READ_STR_SYSCALL  = 8
+EXIT_SYSCALL      = 10 
+
+.data
+    vector: .space 256
+    N: .word 0
+    spatiu: .asciiz " "
+
+.text
+func main:
+    li $v0, READ_INT_SYSCALL
+    syscall
+    la $t1, N
+    sw $v0, ($t1)
+
+    lw $t1, ($t1)
+    li $t2, 0
+    la $t3, vector
+loop_citire:
+    bge $t2, $t1, iesire_citire
+    
+    li $v0, READ_INT_SYSCALL
+    syscall
+    sw $v0, ($t3)
+
+    addiu $t2, $t2, 1
+    addiu $t3, $t3, 4
+    j loop_citire
+
+iesire_citire:
+
+    la $t1, vector
+    la $t2, N
+    lw $t2, ($t2)
+    call modifica $t1 $t2  
+
+    la $t1, N
+    lw $t1, ($t1)
+    li $t2, 0
+    la $t3, vector
+loop_scriere:
+    bge $t2, $t1, iesire_scriere
+
+    lw $t4, ($t3)
+    move $a0, $t4
+    li $v0, PRINT_INT_SYSCALL
+    syscall
+
+    la $t4, spatiu
+    move $a0, $t4
+    li $v0, PRINT_STR_SYSCALL
+    syscall
+
+    addiu $t2, $t2, 1
+    addiu $t3, $t3, 4
+    j loop_scriere
+
+iesire_scriere:
+
+    exit
+
+func modifica:
+    save $s0
+    save $s1
+
+    arg varVectorIntrare
+    arg varVectorDim
+
+    lw $t1, varVectorDim
+    beq $t1, 1, rezolva
+ 
+    # $t1 = n / 2
+    lw $t1, varVectorDim
+    li $t2, 2
+    div $t1, $t2
+    mflo $t1
+   
+    # modifica(v, n / 2)
+    lw $t2, varVectorIntrare
+    call modifica $t2 $t1 
+
+    # $t1 = n / 2
+    lw $t1, varVectorDim
+    li $t2, 2
+    div $t1, $t2
+    mflo $t1
+
+    # $t2 = n - n / 2
+    lw $t2, varVectorDim
+    subu $t2, $t2, $t1
+
+    # $t3 = v + n / 2
+    lw $t3, varVectorIntrare
+    addu $t3, $t3, $t1
+
+    # modifica(v + n / 2, n - n / 2)
+    call modifica $t3 $t2 
+
+    j modifica_iesire
+
+rezolva:
+    lw $t1, varVectorIntrare
+    lw $t1, ($t1)
+
+    call suma_patrate $t1
+    lw $t1, varVectorIntrare
+    sw $v0, ($t1)
+
+modifica_iesire:
+
+    return
+
+func suma_patrate:
+    save $s0
+    arg varY
+
+    lw $t1, varY
+    subu $t1, $t1, 1
+    call calculeaza_suma_patrate $t1
+    return reg $v0
+
+func calculeaza_suma_patrate:
+    save $s0
+    arg varX
+
+    lw $t1, varX
+    beq $t1, 1, returneaza_1
+
+    mult $t1, $t1
+    mflo $s0
+
+    subu $t2, $t1, 1
+    call calculeaza_suma_patrate $t2
+
+    addu $t1, $s0, $v0
+    j calculeaza_suma_patrate_iesire
+
+returneaza_1:
+    li $t1, 1
+    j calculeaza_suma_patrate_iesire
+
+calculeaza_suma_patrate_iesire:
+    return reg $t1

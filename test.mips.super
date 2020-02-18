@@ -1,0 +1,66 @@
+.text
+main:
+sw $ra, ($sp)
+subu $sp, $sp, 4
+    li $s0, 0xdead
+    li $s1, 0xbeef
+    li $s2, 0xcafe
+
+    li $t1, 0xbad
+    li $t2, 0xbeef
+
+    subu $sp, $sp, 8
+    sw $t1, 0($sp)
+    sw $t2, 4($sp)
+    subu $sp, $sp, 4
+    jal sum
+    addiu $sp, $sp, 8
+
+    li $v0, EXIT_SYSCALL
+    syscall
+
+sum:
+sw $ra, ($sp)
+subu $sp, $sp, 4
+    sw $s0, -0($sp)
+    sw $s1, -4($sp)
+    sw $s2, -8($sp)
+    subu $sp, $sp, 12
+    sw $fp, ($sp)
+    subu $sp, $sp, 4
+    move $fp, $sp
+    subu $sp, $sp, 12
+
+
+    li $t0, 0
+    sw $t0, -0($fp)
+    li $t0, 5
+    sw $t0, -4($fp)
+    li $t0, 10
+    sw $t0, -8($fp)
+
+    
+    li $t1, 0
+    lw $t2, -4($fp)
+    lw $t3, -8($fp)
+    addu $t1, $t2, $t3
+    lw $t2, 24($fp)
+    lw $t3, 28($fp)
+    addu $t1, $t1, $t2
+    addu $t1, $t1, $t3
+
+    sw $t1, -0($fp)
+
+
+    lw $t0, -0($fp)
+    move $v0, $t0
+
+    addiu $sp, $sp, 12
+    lw $fp, 0($sp)
+    addiu $sp, $sp, 8
+    lw $s0, 8($sp)
+    lw $s1, 4($sp)
+    lw $s2, 0($sp)
+    addiu $sp, $sp, 12
+    lw $ra, 0($sp)
+    jr $ra

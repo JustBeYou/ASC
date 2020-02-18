@@ -1,0 +1,84 @@
+PRINT_INT_SYSCALL = 1
+PRINT_STR_SYSCALL = 4
+READ_INT_SYSCALL  = 5
+READ_STR_SYSCALL  = 8
+EXIT_SYSCALL      = 10 
+
+main:
+sw $ra, ($sp)
+subu $sp, $sp, 4
+    li $v0, READ_INT_SYSCALL
+    syscall
+
+    subu $sp, $sp, 4
+    sw $v0, 0($sp)
+    subu $sp, $sp, 4
+    jal fib
+    addiu $sp, $sp, 4
+
+    move $a0, $v0
+    li $v0, PRINT_INT_SYSCALL
+    syscall
+
+    li $v0, EXIT_SYSCALL
+    syscall
+
+fib:
+sw $ra, ($sp)
+subu $sp, $sp, 4
+    sw $s0, -0($sp)
+    sw $s1, -4($sp)
+    subu $sp, $sp, 8
+    sw $fp, ($sp)
+    subu $sp, $sp, 4
+    move $fp, $sp
+    subu $sp, $sp, 0
+
+
+    lw $t1, 20($fp)
+    beq $t1, 0, returneaza_0
+    beq $t1, 1, returneaza_1
+    
+    subu $t1, $t1, 1
+    subu $sp, $sp, 4
+    sw $t1, 0($sp)
+    subu $sp, $sp, 4
+    jal fib
+    addiu $sp, $sp, 4
+    move $s1, $v0
+
+    lw $t1, 20($fp)
+    subu $t1, $t1, 2
+    subu $sp, $sp, 4
+    sw $t1, 0($sp)
+    subu $sp, $sp, 4
+    jal fib
+    addiu $sp, $sp, 4
+    
+    addu $t1, $s1, $v0
+
+    j iesire
+
+returneaza_0:
+    li $t1, 0
+    j iesire
+
+returneaza_1:
+    li $t1, 1
+    j iesire
+
+iesire:
+
+    move $v0, $t1
+
+    addiu $sp, $sp, 4
+    lw $fp, 0($sp)
+    addiu $sp, $sp, 4
+    lw $s0, 4($sp)
+    lw $s1, 0($sp)
+    addiu $sp, $sp, 8
+    lw $ra, 0($sp)
+    addiu $sp, $sp, 4
+    jr $ra
+
+

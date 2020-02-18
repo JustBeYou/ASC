@@ -1,0 +1,51 @@
+PRINT_INT_SYSCALL = 1
+PRINT_STR_SYSCALL = 4
+READ_INT_SYSCALL  = 5
+READ_STR_SYSCALL  = 8
+EXIT_SYSCALL      = 10 
+
+func main:
+    li $v0, READ_INT_SYSCALL
+    syscall
+
+    call fib $v0
+
+    move $a0, $v0
+    li $v0, PRINT_INT_SYSCALL
+    syscall
+
+    exit
+
+func fib:
+    save $s0
+    save $s1
+    arg varX
+
+    lw $t1, varX
+    beq $t1, 0, returneaza_0
+    beq $t1, 1, returneaza_1
+    
+    subu $t1, $t1, 1
+    call fib $t1
+    move $s1, $v0
+
+    lw $t1, varX
+    subu $t1, $t1, 2
+    call fib $t1
+    
+    addu $t1, $s1, $v0
+
+    j iesire
+
+returneaza_0:
+    li $t1, 0
+    j iesire
+
+returneaza_1:
+    li $t1, 1
+    j iesire
+
+iesire:
+    return reg $t1
+
+
